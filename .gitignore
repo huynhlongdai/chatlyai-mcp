@@ -1,0 +1,14 @@
+# Live auth tokens & browser profiles — NEVER commit
+profiles/
+downloads/
+recon/netlog*.jsonl
+recon/sse_dump.txt
+recon/localstorage.json
+recon/shots/
+recon/*.png
+recon/test_img.png
+
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
