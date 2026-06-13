@@ -83,24 +83,30 @@ STYLE_ID_TO_MODEL: dict[str, str] = {v["styleId"]: k for k, v in IMAGE_MODELS.it
 IMAGE_ASPECT_RATIOS = ["1:1", "3:4", "4:3", "16:9", "9:16"]
 IMAGE_RESOLUTIONS   = ["1K", "2K", "4K"]
 
-# ── Known model IDs (video / music) ───────────────────────────────────────────
-# These map friendly names to the model slugs used in the API payload.
-# Discovered by switching models in the Chatly UI and capturing the POST.
+# ── Video model mappings ───────────────────────────────────────────────────────
+# Extracted from ChatlyAI's Firebase Remote Config via React fiber tree.
 
-VIDEO_MODELS: dict[str, str] = {
-    "seedance-2":     "vgpt-kk-2-6",
-    "kling-3-pro":    "vgpt-kk-2-6",
-    "veo-3.1":        "vgpt-kk-2-6",
-    "runway-4.5":     "vgpt-kk-2-6",
-    "wan-2.6":        "vgpt-kk-2-6",
-    "pixverse-v6":    "vgpt-kk-2-6",
-    "grok-video":     "vgpt-kk-2-6",
+VIDEO_MODELS: dict[str, dict] = {
+    "veo-3.1":          {"styleId": "17001", "creditCount": 0, "isPro": True, "durations": [4,6,8],                        "resolutions": ["720p","1080p","4k"], "aspectRatios": ["16:9","9:16","auto"],                                "description": "Google's latest flagship video model with cinematic quality"},
+    "veo-3.1-fast":     {"styleId": "17002", "creditCount": 0, "isPro": True, "durations": [4,6,8],                        "resolutions": ["720p","1080p","4k"], "aspectRatios": ["16:9","9:16"],                                      "description": "Faster variant of Veo 3.1 for quick iterations"},
+    "veo-3.1-lite":     {"styleId": "17004", "creditCount": 0, "isPro": True, "durations": [8],                            "resolutions": ["720p","1080p"],      "aspectRatios": ["16:9","9:16"],                                      "description": "Lightweight Veo 3.1 for cost-effective generation"},
+    "kling-3-pro":      {"styleId": "11020", "creditCount": 0, "isPro": True, "durations": list(range(3,16)),               "resolutions": ["1080p"],             "aspectRatios": ["16:9","9:16","1:1"],                                "description": "Kling's newest professional video model"},
+    "kling-2.6-pro":    {"styleId": "11017", "creditCount": 0, "isPro": True, "durations": [5,10],                          "resolutions": [],                    "aspectRatios": ["16:9","9:16","1:1"],                                "description": "Kling 2.6 Pro for high-quality video generation"},
+    "wan-2.6":          {"styleId": "22309", "creditCount": 0, "isPro": True, "durations": [5,10,15],                       "resolutions": ["720p","1080p"],      "aspectRatios": ["16:9","9:16","1:1","4:3","3:4"],                    "description": "Wan 2.6 video generation model"},
+    "pixverse-v6":      {"styleId": "14010", "creditCount": 0, "isPro": True, "durations": list(range(5,16)),               "resolutions": ["540p","720p","1080p"],"aspectRatios": ["16:9","4:3","1:1","3:4","9:16","2:3","3:2","21:9"],"description": "Pixverse v6 for creative video generation"},
+    "runway-4.5":       {"styleId": "60601", "creditCount": 0, "isPro": True, "durations": [5,8,10],                        "resolutions": ["720p"],              "aspectRatios": ["16:9","9:16","1:1"],                                "description": "Runway 4.5 for creative video generation"},
+    "seedance-1.5-pro": {"styleId": "21904", "creditCount": 0, "isPro": True, "durations": list(range(4,13)),               "resolutions": ["480p","720p"],       "aspectRatios": ["auto","21:9","16:9","4:3","1:1","3:4","9:16"],      "description": "Seedance 1.5 Pro for dynamic motion video"},
+    "seedance-2":       {"styleId": "21905", "creditCount": 0, "isPro": True, "durations": list(range(4,16)),               "resolutions": ["480p","720p","1080p"],"aspectRatios": ["auto","21:9","16:9","4:3","1:1","3:4","9:16"],     "description": "Seedance 2 next-generation motion model"},
+    "grok-video":       {"styleId": "22801", "creditCount": 0, "isPro": True, "durations": list(range(6,16)),               "resolutions": ["480p","720p"],       "aspectRatios": ["16:9","4:3","3:2","1:1","2:3","3:4","9:16"],        "description": "xAI Grok Video generation model"},
 }
 
-MUSIC_MODELS: dict[str, str] = {
-    "elevenlabs":     "vgpt-kk-2-6",
-    "lyria-2":        "vgpt-kk-2-6",
-    "minimax-2.6":    "vgpt-kk-2-6",
-    "cassette-ai":    "vgpt-kk-2-6",
-    "ace-step":       "vgpt-kk-2-6",
+# ── Music model mappings ──────────────────────────────────────────────────────
+
+MUSIC_MODELS: dict[str, dict] = {
+    "elevenlabs-music":         {"styleId": "90000", "creditCount": 0, "isPro": True, "description": "ElevenLabs Music for high-quality AI song and track generation"},
+    "minimax-music-2.6":        {"styleId": "90001", "creditCount": 0, "isPro": True, "description": "MiniMax Music 2.6 for long-form music with rich style coherence"},
+    "elevenlabs-sound-effects": {"styleId": "90002", "creditCount": 0, "isPro": True, "description": "ElevenLabs Sound Effects for realistic AI-generated audio and ambience"},
+    "cassette-ai":              {"styleId": "90003", "creditCount": 0, "isPro": True, "description": "CassetteAI for genre and mood-directed AI music composition"},
+    "ace-step":                 {"styleId": "90004", "creditCount": 0, "isPro": True, "description": "Ace Step for fast, high-fidelity open-source music generation"},
+    "lyria-2":                  {"styleId": "90005", "creditCount": 0, "isPro": True, "description": "Lyria 2 by Google for expressive music with rich harmonic depth"},
 }

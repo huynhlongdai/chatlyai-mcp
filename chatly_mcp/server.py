@@ -122,30 +122,83 @@ def chatly_generate_image(
 # ── Video generation ──────────────────────────────────────────────────────────
 
 @mcp.tool()
+def chatly_list_video_models() -> list[dict]:
+    """List all available video generation models with their options.
+
+    Returns each model's slug, styleId, supported durations,
+    resolutions, aspect ratios, and description.
+    """
+    return [
+        {"slug": slug, **info}
+        for slug, info in config.VIDEO_MODELS.items()
+    ]
+
+
+@mcp.tool()
 def chatly_generate_video(
     prompt: str,
-    account: Optional[str] = None,
+    model: str = "veo-3.1",
     aspect_ratio: str = config.DEFAULT_VIDEO_ASPECT,
     resolution: str = config.DEFAULT_VIDEO_RESOLUTION,
     duration: int = config.DEFAULT_VIDEO_DURATION,
-    style_id: str = config.DEFAULT_VIDEO_STYLE_ID,
+    style_id: Optional[str] = None,
     download: bool = False,
+    account: Optional[str] = None,
 ) -> dict:
     """Generate a video from a text prompt via Chatly's video dashboard.
 
-    Available aspect ratios: "16:9", "9:16", "1:1".
-    Resolutions: "720p", "1080p".
-    Duration: 4, 8, or 16 seconds (model-dependent).
+    Args:
+        prompt:       Text description of the video to create.
+        model:        Model slug. Use chatly_list_video_models() to see all.
+                      Common choices:
+                        "veo-3.1"        – Google Veo 3.1, cinematic (default)
+                        "veo-3.1-fast"   – Faster Veo variant
+                        "veo-3.1-lite"   – Lightweight Veo, cost-effective
+                        "kling-3-pro"    – Kling 3.0 Pro, 3–15s
+                        "kling-2.6-pro"  – Kling 2.6 Pro
+                        "seedance-2"     – Seedance 2, motion-heavy
+                        "runway-4.5"     – Runway 4.5
+                        "wan-2.6"        – Wan 2.6
+                        "pixverse-v6"    – Pixverse v6, many aspect ratios
+                        "grok-video"     – xAI Grok Video
+                        "seedance-1.5-pro" – Seedance 1.5 Pro
+        aspect_ratio: e.g. "16:9", "9:16", "1:1" (model-dependent).
+        resolution:   "480p", "540p", "720p", "1080p", or "4k" (model-dependent).
+        duration:     Seconds (model-dependent, e.g. 4, 5, 8, 10, 15).
+        style_id:     Override model selection with a raw style_id string.
+        download:     If True, also download video to local disk.
+        account:      Account name (defaults to first configured account).
 
     Returns the generated video URL(s) (and local paths if download=True).
     Video generation can take 30–120+ seconds.
     """
+    if style_id is None:
+        model_info = config.VIDEO_MODELS.get(model)
+        if model_info is None:
+            available = ", ".join(sorted(config.VIDEO_MODELS.keys()))
+            return {"error": f"Unknown model '{model}'. Available: {available}"}
+        style_id = model_info["styleId"]
+        # Validate duration
+        supported_dur = model_info.get("durations", [])
+        if supported_dur and duration not in supported_dur:
+            duration = supported_dur[0]
+        # Validate resolution
+        supported_res = model_info.get("resolutions", [])
+        if supported_res and resolution not in supported_res:
+            resolution = supported_res[0]
+        # Validate aspect ratio
+        supported_ar = model_info.get("aspectRatios", [])
+        if supported_ar and aspect_ratio not in supported_ar:
+            aspect_ratio = supported_ar[0]
+
     client = _client(account)
     res = client.generate_video(
         prompt, aspect_ratio=aspect_ratio, resolution=resolution,
         duration=duration, style_id=style_id,
     )
     out = res.to_dict()
+    out["model_used"] = model
+    out["style_id"] = style_id
     if download and res.videos:
         out["downloaded"] = [client.download(u) for u in res.videos]
     return out
@@ -154,20 +207,55 @@ def chatly_generate_video(
 # ── Music generation ──────────────────────────────────────────────────────────
 
 @mcp.tool()
+def chatly_list_music_models() -> list[dict]:
+    """List all available music/audio generation models with descriptions.
+
+    Returns each model's slug, styleId, and description.
+    """
+    return [
+        {"slug": slug, **info}
+        for slug, info in config.MUSIC_MODELS.items()
+    ]
+
+
+@mcp.tool()
 def chatly_generate_music(
     prompt: str,
-    account: Optional[str] = None,
-    style_id: str = config.DEFAULT_MUSIC_STYLE_ID,
+    model: str = "elevenlabs-music",
+    style_id: Optional[str] = None,
     download: bool = False,
+    account: Optional[str] = None,
 ) -> dict:
     """Generate music/audio from a text prompt via Chatly's music dashboard.
 
-    Describe the genre, mood, instruments, tempo, and vibe you want.
+    Args:
+        prompt:   Describe the genre, mood, instruments, tempo, and vibe.
+        model:    Model slug. Use chatly_list_music_models() to see all.
+                  Common choices:
+                    "elevenlabs-music"         – High-quality AI songs (default)
+                    "minimax-music-2.6"        – Long-form, rich style coherence
+                    "elevenlabs-sound-effects" – Realistic sound effects & ambience
+                    "cassette-ai"              – Genre & mood-directed composition
+                    "ace-step"                 – Fast, high-fidelity open-source
+                    "lyria-2"                  – Google Lyria 2, expressive & harmonic
+        style_id: Override model selection with a raw style_id string.
+        download: If True, also download audio to local disk.
+        account:  Account name (defaults to first configured account).
+
     Returns the generated audio URL(s) (and local paths if download=True).
     """
+    if style_id is None:
+        model_info = config.MUSIC_MODELS.get(model)
+        if model_info is None:
+            available = ", ".join(sorted(config.MUSIC_MODELS.keys()))
+            return {"error": f"Unknown model '{model}'. Available: {available}"}
+        style_id = model_info["styleId"]
+
     client = _client(account)
     res = client.generate_music(prompt, style_id=style_id)
     out = res.to_dict()
+    out["model_used"] = model
+    out["style_id"] = style_id
     if download and res.audios:
         out["downloaded"] = [client.download(u) for u in res.audios]
     return out

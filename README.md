@@ -98,15 +98,19 @@ python -m chatly_mcp.server     # stdio transport
 | `chatly_list_accounts()` | List accounts + token status. |
 | `chatly_credits(account?)` | Remaining credits. |
 | `chatly_quota(account?)` | Per-feature usage limits. |
-| `chatly_list_image_models()` | List all image models with options. |
+| `chatly_list_image_models()` | List all 17 image models with options. |
 | `chatly_generate_image(...)` | Generate image(s) with full model/option control. |
-| `chatly_generate_video(...)` | Generate video. |
-| `chatly_generate_music(...)` | Generate music/audio. |
+| `chatly_list_video_models()` | List all 11 video models with options. |
+| `chatly_generate_video(...)` | Generate video with full model/option control. |
+| `chatly_list_music_models()` | List all 6 music/audio models. |
+| `chatly_generate_music(...)` | Generate music/audio with model selection. |
 | `chatly_create_script(prompt)` | Long-form text / kịch bản. |
 | `chatly_chat(prompt, web_search?)` | Ask the OmniAgent. |
 | `chatly_login(email, password)` | Add/refresh account (needs display). |
 
-### Image generation — full options
+---
+
+### 🖼️ Image generation — 17 models
 
 ```python
 chatly_generate_image(
@@ -118,8 +122,6 @@ chatly_generate_image(
     download=True,              # save to local disk
 )
 ```
-
-#### Available image models
 
 | Model slug | Style ID | Credits | Pro? | Resolutions |
 |---|---|---|---|---|
@@ -143,15 +145,59 @@ chatly_generate_image(
 
 All models support aspect ratios: `1:1`, `3:4`, `4:3`, `16:9`, `9:16`.
 
-### Video generation parameters
+---
 
-- **aspect_ratio**: `"16:9"`, `"9:16"`, `"1:1"`
-- **resolution**: `"720p"`, `"1080p"`
-- **duration**: `4`, `8`, or `16` seconds (model-dependent)
+### 🎬 Video generation — 11 models
 
-### Music generation
+```python
+chatly_generate_video(
+    prompt="a cat walking through a garden at sunset",
+    model="veo-3.1",           # see table below
+    aspect_ratio="16:9",       # model-dependent
+    resolution="720p",         # 480p–4k, model-dependent
+    duration=8,                # seconds, model-dependent
+    download=True,
+)
+```
 
-Describe the genre, mood, instruments, tempo, and vibe you want.
+| Model slug | Style ID | Durations (s) | Resolutions | Aspect Ratios |
+|---|---|---|---|---|
+| `veo-3.1` | 17001 | 4, 6, 8 | 720p, 1080p, 4k | 16:9, 9:16, auto |
+| `veo-3.1-fast` | 17002 | 4, 6, 8 | 720p, 1080p, 4k | 16:9, 9:16 |
+| `veo-3.1-lite` | 17004 | 8 | 720p, 1080p | 16:9, 9:16 |
+| `kling-3-pro` | 11020 | 3–15 | 1080p | 16:9, 9:16, 1:1 |
+| `kling-2.6-pro` | 11017 | 5, 10 | — | 16:9, 9:16, 1:1 |
+| `wan-2.6` | 22309 | 5, 10, 15 | 720p, 1080p | 16:9, 9:16, 1:1, 4:3, 3:4 |
+| `pixverse-v6` | 14010 | 5–15 | 540p, 720p, 1080p | 16:9, 4:3, 1:1, 3:4, 9:16, 2:3, 3:2, 21:9 |
+| `runway-4.5` | 60601 | 5, 8, 10 | 720p | 16:9, 9:16, 1:1 |
+| `seedance-1.5-pro` | 21904 | 4–12 | 480p, 720p | auto, 21:9, 16:9, 4:3, 1:1, 3:4, 9:16 |
+| `seedance-2` | 21905 | 4–15 | 480p, 720p, 1080p | auto, 21:9, 16:9, 4:3, 1:1, 3:4, 9:16 |
+| `grok-video` | 22801 | 6–15 | 480p, 720p | 16:9, 4:3, 3:2, 1:1, 2:3, 3:4, 9:16 |
+
+> Video generation takes 30–120+ seconds depending on model and duration.
+
+---
+
+### 🎵 Music/Audio generation — 6 models
+
+```python
+chatly_generate_music(
+    prompt="upbeat electronic dance track with synths and a driving bassline",
+    model="elevenlabs-music",  # see table below
+    download=True,
+)
+```
+
+| Model slug | Style ID | Description |
+|---|---|---|
+| `elevenlabs-music` | 90000 | High-quality AI song and track generation |
+| `minimax-music-2.6` | 90001 | Long-form music with rich style coherence |
+| `elevenlabs-sound-effects` | 90002 | Realistic AI-generated sound effects & ambience |
+| `cassette-ai` | 90003 | Genre and mood-directed AI music composition |
+| `ace-step` | 90004 | Fast, high-fidelity open-source music generation |
+| `lyria-2` | 90005 | Google Lyria 2, expressive music with rich harmonic depth |
+
+---
 
 ## Multi-account
 
@@ -161,12 +207,11 @@ Drop one `*_state.json` per account in `profiles/`. Per-tool `account=` selects 
 
 - ✅ Login via CloakBrowser (Turnstile bypassed), session persistence
 - ✅ Image generation — 17 models, full options (model, resolution, aspect ratio, count)
-- ✅ Video generation (ultra-agent + artifact_event parsing)
-- ✅ Music generation (ultra-agent + artifact_event parsing)
+- ✅ Video generation — 11 models, full options (model, duration, resolution, aspect ratio)
+- ✅ Music/Audio generation — 6 models with model selection
 - ✅ Script / chat / OmniAgent
 - ✅ Credits & quota
-- ⏳ Per-model selection for video/music (need to map model IDs per provider)
-- ⏳ Token auto-refresh (re-login for now)
+- ⏳ Token auto-refresh (re-login for now; tokens last ~6 hours)
 
 ## ⚠️ Notes
 - Automating accounts may violate ChatlyAI's Terms of Service. Use at your own risk.
