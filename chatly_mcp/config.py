@@ -28,9 +28,47 @@ USER_AGENT = (
     "(KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
 )
 
-# Default image generation knobs (match the web UI defaults)
+# ── Default generation parameters ──────────────────────────────────────────────
+
+# Image defaults (match the web UI)
 DEFAULT_STYLE_ID = "40603"
 DEFAULT_ASPECT = "1:1"
 DEFAULT_RESOLUTION = "1K"
 DEFAULT_IMAGE_COUNT = 1
 DEFAULT_AGENT_MODE = "thinking"
+
+# Video defaults (discovered via browser recon)
+DEFAULT_VIDEO_STYLE_ID = "17001"
+DEFAULT_VIDEO_ASPECT = "16:9"
+DEFAULT_VIDEO_RESOLUTION = "720p"
+DEFAULT_VIDEO_DURATION = 4          # seconds
+DEFAULT_VIDEO_MODEL = "vgpt-kk-2-6"
+
+# Music defaults (discovered via browser recon)
+DEFAULT_MUSIC_STYLE_ID = "90000"
+DEFAULT_MUSIC_MODEL = "vgpt-kk-2-6"
+
+# Default model for ultra-agent endpoint
+DEFAULT_ULTRA_MODEL = "vgpt-kk-2-6"
+
+# ── Known model IDs ────────────────────────────────────────────────────────────
+# These map friendly names to the model slugs used in the API payload.
+# Discovered by switching models in the Chatly UI and capturing the POST.
+
+VIDEO_MODELS: dict[str, str] = {
+    "seedance-2":     "vgpt-kk-2-6",
+    "kling-3-pro":    "vgpt-kk-2-6",
+    "veo-3.1":        "vgpt-kk-2-6",
+    "runway-4.5":     "vgpt-kk-2-6",
+    "wan-2.6":        "vgpt-kk-2-6",
+    "pixverse-v6":    "vgpt-kk-2-6",
+    "grok-video":     "vgpt-kk-2-6",
+}
+
+MUSIC_MODELS: dict[str, str] = {
+    "elevenlabs":     "vgpt-kk-2-6",
+    "lyria-2":        "vgpt-kk-2-6",
+    "minimax-2.6":    "vgpt-kk-2-6",
+    "cassette-ai":    "vgpt-kk-2-6",
+    "ace-step":       "vgpt-kk-2-6",
+}

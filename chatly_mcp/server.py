@@ -21,6 +21,8 @@ def _client(account: Optional[str]) -> ChatlyClient:
     return ChatlyClient(acct)
 
 
+# ── Account & info tools ──────────────────────────────────────────────────────
+
 @mcp.tool()
 def chatly_list_accounts() -> list[dict]:
     """List configured ChatlyAI accounts and their token status."""
@@ -38,6 +40,8 @@ def chatly_quota(account: Optional[str] = None) -> dict:
     """Get per-feature usage quota for an account."""
     return _client(account).quota()
 
+
+# ── Image generation ──────────────────────────────────────────────────────────
 
 @mcp.tool()
 def chatly_generate_image(
@@ -64,6 +68,62 @@ def chatly_generate_image(
     return out
 
 
+# ── Video generation ──────────────────────────────────────────────────────────
+
+@mcp.tool()
+def chatly_generate_video(
+    prompt: str,
+    account: Optional[str] = None,
+    aspect_ratio: str = config.DEFAULT_VIDEO_ASPECT,
+    resolution: str = config.DEFAULT_VIDEO_RESOLUTION,
+    duration: int = config.DEFAULT_VIDEO_DURATION,
+    style_id: str = config.DEFAULT_VIDEO_STYLE_ID,
+    download: bool = False,
+) -> dict:
+    """Generate a video from a text prompt via Chatly's video dashboard.
+
+    Available aspect ratios: "16:9", "9:16", "1:1".
+    Resolutions: "720p", "1080p".
+    Duration: 4, 8, or 16 seconds (model-dependent).
+
+    Returns the generated video URL(s) (and local paths if download=True).
+    Video generation can take 30–120+ seconds.
+    """
+    client = _client(account)
+    res = client.generate_video(
+        prompt, aspect_ratio=aspect_ratio, resolution=resolution,
+        duration=duration, style_id=style_id,
+    )
+    out = res.to_dict()
+    if download and res.videos:
+        out["downloaded"] = [client.download(u) for u in res.videos]
+    return out
+
+
+# ── Music generation ──────────────────────────────────────────────────────────
+
+@mcp.tool()
+def chatly_generate_music(
+    prompt: str,
+    account: Optional[str] = None,
+    style_id: str = config.DEFAULT_MUSIC_STYLE_ID,
+    download: bool = False,
+) -> dict:
+    """Generate music/audio from a text prompt via Chatly's music dashboard.
+
+    Describe the genre, mood, instruments, tempo, and vibe you want.
+    Returns the generated audio URL(s) (and local paths if download=True).
+    """
+    client = _client(account)
+    res = client.generate_music(prompt, style_id=style_id)
+    out = res.to_dict()
+    if download and res.audios:
+        out["downloaded"] = [client.download(u) for u in res.audios]
+    return out
+
+
+# ── Text / chat tools ────────────────────────────────────────────────────────
+
 @mcp.tool()
 def chatly_create_script(prompt: str, account: Optional[str] = None) -> dict:
     """Create a script / kịch bản (or any long-form text) via Chatly's agent."""
@@ -79,6 +139,8 @@ def chatly_chat(
     res = _client(account).chat(prompt, web_search=web_search)
     return {"chat_id": res.chat_id, "text": res.text, "images": res.images}
 
+
+# ── Login ─────────────────────────────────────────────────────────────────────
 
 @mcp.tool()
 def chatly_login(email: str, password: str, name: str = "account1") -> dict:
