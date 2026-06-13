@@ -51,7 +51,39 @@ DEFAULT_MUSIC_MODEL = "vgpt-kk-2-6"
 # Default model for ultra-agent endpoint
 DEFAULT_ULTRA_MODEL = "vgpt-kk-2-6"
 
-# ── Known model IDs ────────────────────────────────────────────────────────────
+# ── Image model mappings ───────────────────────────────────────────────────────
+# Extracted from ChatlyAI's Firebase Remote Config via React fiber tree.
+# Each model is keyed by a friendly slug; value is a dict with
+#   styleId, creditCount, isPro, aspectRatios, resolutions.
+
+IMAGE_MODELS: dict[str, dict] = {
+    "auto":              {"styleId": "41201", "creditCount": 0,   "isPro": False, "resolutions": [],              "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "nano-banana-2":     {"styleId": "40603", "creditCount": 72,  "isPro": True,  "resolutions": ["1K","2K","4K"],"aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "nano-banana-pro":   {"styleId": "40602", "creditCount": 90,  "isPro": True,  "resolutions": ["1K","2K","4K"],"aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "nano-banana":       {"styleId": "40601", "creditCount": 24,  "isPro": True,  "resolutions": ["1K"],          "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "midjourney-v7":     {"styleId": "80101", "creditCount": 60,  "isPro": True,  "resolutions": [],              "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "gpt-image-2":       {"styleId": "41701", "creditCount": 132, "isPro": True,  "resolutions": ["1K","2K","4K"],"aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "grok-image":        {"styleId": "41401", "creditCount": 14,  "isPro": False, "resolutions": ["1K","2K"],     "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "imagineart-2":      {"styleId": "41601", "creditCount": 6,   "isPro": False, "resolutions": ["1K","2K"],     "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "seedream-5-lite":   {"styleId": "40406", "creditCount": 21,  "isPro": True,  "resolutions": [],              "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "seedream-4.5":      {"styleId": "40405", "creditCount": 24,  "isPro": True,  "resolutions": ["4K"],          "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "seedream-4":        {"styleId": "40404", "creditCount": 18,  "isPro": True,  "resolutions": ["4K"],          "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "flux-2-pro":        {"styleId": "40108", "creditCount": 27,  "isPro": True,  "resolutions": ["2K"],          "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "flux-kontext-pro":  {"styleId": "40107", "creditCount": 24,  "isPro": True,  "resolutions": [],              "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "ideogram-3":        {"styleId": "40202", "creditCount": 36,  "isPro": True,  "resolutions": ["1K"],          "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "z-image-turbo":     {"styleId": "41201", "creditCount": 3,   "isPro": False, "resolutions": [],              "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "qwen-image":        {"styleId": "40501", "creditCount": 12,  "isPro": False, "resolutions": ["1K"],          "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+    "qwen-image-edit":   {"styleId": "40502", "creditCount": 18,  "isPro": False, "resolutions": [],              "aspectRatios": ["1:1","3:4","4:3","16:9","9:16"]},
+}
+
+# Reverse lookup: styleId → model slug
+STYLE_ID_TO_MODEL: dict[str, str] = {v["styleId"]: k for k, v in IMAGE_MODELS.items() if k != "auto"}
+
+# All valid aspect ratios and resolutions
+IMAGE_ASPECT_RATIOS = ["1:1", "3:4", "4:3", "16:9", "9:16"]
+IMAGE_RESOLUTIONS   = ["1K", "2K", "4K"]
+
+# ── Known model IDs (video / music) ───────────────────────────────────────────
 # These map friendly names to the model slugs used in the API payload.
 # Discovered by switching models in the Chatly UI and capturing the POST.
 
